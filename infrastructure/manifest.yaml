@@ -33,8 +33,6 @@ nodes:
     nodeGroup: "sqldb"
     intIP: 10.101.3.60
     tag: "12.3"
-    password: ${globals.db_password}
-    skipNodeEmails: true
     docker:
       cmd: /usr/lib/systemd/systemd
       env:
@@ -61,7 +59,7 @@ nodes:
       volumes: ["/home/jelastic/ROOT"]
       cmd: /usr/lib/systemd/systemd
       env:
-        APP_FILE: server.js
+        APP_FILE: src/server.js
         AUTO_OLD_HEAP: true
         DOCKER_EXPOSED_PORT: 22,25,3000,443,7979,80,8080,21
         HOME_DIR: /home/jelastic/
@@ -95,18 +93,20 @@ onInstall:
         PGPASSWORD=${globals.db_password} psql -U webadmin -d postgres -c 'GRANT ALL ON DATABASE ${globals.databaseName} TO ${globals.databaseUser};'
   - adjust-env-vars-db
   - adjust-env-vars
-
-deploy:
-  archive: ${settings.deploymentUrl}
-  name: Search Properties
+  - deploy [cp]:
+      archive: ${settings.deploymentUrl}
+      name: Search Properties
+  - appInit
 
 onAfterDeploy:
-  cmd [cp]:
-    - cd /home/jelastic/ROOT
-    - npm ci
-    - npm run migrate
+  - appInit
 
 actions:
+  appInit:
+    cmd [cp]:
+      - cd /home/jelastic/ROOT
+      - npm ci
+      - npm run migrate
   getPswd:
     - cmd [sqldb]: |-
         jcm getPswd
