@@ -1,0 +1,132 @@
+type: install
+version: 1.8.1
+name: properties-search-node-with-postgres
+ssl: true
+
+settings:
+  fields:
+    - caption: App ID
+      name: apiAppId
+      type: string
+      required: true
+    - caption: App Key
+      name: apiAppKey
+      type: string
+      required: true
+    - caption: URL to deployment archive
+      name: deploymentUrl
+      type: string
+      required: true
+      default: https://github.com/evvo/search_properties/archive/master.zip
+
+globals:
+  databaseName: app_database
+  databaseUser: app_user
+  databasePassword: ${fn.password(10)}
+
+nodes:
+  # PostgreSQL
+  - nodeType: postgresql
+    fixedCloudlets: 1
+    cloudlets: 8,
+    diskLimit: "100G"
+    nodeGroup: "sqldb"
+    intIP: 10.101.3.60
+    tag: "12.3"
+    password: ${globals.db_password}
+    skipNodeEmails: true
+    docker:
+      cmd: /usr/lib/systemd/systemd
+      env:
+        ADMINPANEL_ENABLED: true
+        DOCKER_EXPOSED_PORT: "21,22,25,5432,7979,80"
+        MASTER_HOST: node43379
+        MASTER_ID: 43379
+        MASTER_IP: "10.101.3.60"
+        PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        PHPPGADMIN_VERSION: 7.12.1
+        POSTGRES_VERSION: 12.3
+        STACK_USER: postgres
+  # Node
+  - nodeType: "nodejs"
+    fixedCloudlets: 1
+    cloudlets: 8
+    diskLimit: "100G"
+    nodeGroup: cp
+    tag: "12.18.2-supervisor"
+    intIP: 10.101.3.61
+    links:
+      - sqldb:DB
+    docker:
+      volumes: ["/home/jelastic/ROOT"]
+      cmd: /usr/lib/systemd/systemd
+      env:
+        APP_FILE: server.js
+        AUTO_OLD_HEAP: true
+        DOCKER_EXPOSED_PORT: 22,25,3000,443,7979,80,8080,21
+        HOME_DIR: /home/jelastic/
+        MASTER_HOST: node43380
+        MASTER_ID: 43380
+        MASTER_IP: "10.101.3.61"
+        NODE_ENV: production
+        NODE_OPTIONS: --trace-warnings
+        NVM_DIR: /opt/.nvm
+        PACKAGE_MANAGER: npm
+        PACKAGE_MANAGER_OPTS: 
+        PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        PROCESS_MANAGER: supervisor
+        PROCESS_MANAGER_FILE: 
+        REDIRECT_EXCLUDE_PORTS: 22,23,25,21,111,443,771,946,2049,8743,7979
+        ROOT_DIR: /home/jelastic/ROOT
+        STACK_MAJOR_VERSION: 12
+        STACK_NAME: nodejs
+        STACK_PATH: /opt/
+        STACK_SHORT_VERSION: 12
+        STACK_USER: nodejs
+        STACK_VERSION: 12.18.2
+        UPDATE_PACKAGES_ON_RESTART: TRUE
+        WEBROOT: /home/jelastic
+
+onInstall:
+  - getPswd
+  - cmd [sqldb]: |-
+        PGPASSWORD=${globals.db_password} psql -U webadmin -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = '${globals.databaseName}'" | grep -q 1 || psql -U webadmin -d postgres -c "CREATE DATABASE ${globals.databaseName}"
+        PGPASSWORD=${globals.db_password} psql -U webadmin -d postgres -tc "SELECT 1 FROM pg_roles WHERE rolname='${globals.databaseUser}'" | grep -q 1 || psql -U webadmin -d postgres -c "CREATE USER ${globals.databaseUser} with encrypted password '${globals.databasePassword}'"
+        PGPASSWORD=${globals.db_password} psql -U webadmin -d postgres -c 'GRANT ALL ON DATABASE ${globals.databaseName} TO ${globals.databaseUser};'
+  - adjust-env-vars-db
+  - adjust-env-vars
+
+deploy:
+  archive: ${settings.deploymentUrl}
+  name: Search Properties
+
+onAfterDeploy:
+  cmd [cp]:
+    - cd /home/jelastic/ROOT
+    - npm ci
+    - npm run migrate
+
+actions:
+  getPswd:
+    - cmd [sqldb]: |-
+        jcm getPswd
+    - setGlobals:
+        db_password: ${response.out}
+  adjust-env-vars:
+    api [cp]: env.control.AddContainerEnvVars
+    vars:
+      API_APP_ID: ${settings.apiAppId}
+      API_APP_KEY: ${settings.apiAppKey}
+      API_PORT: 8080
+      API_PATH: /api
+      DB_HOST: DB
+      DB_USER: ${globals.databaseUser}
+      DB_PASSWORD: ${globals.databasePassword}
+      DB_NAME: ${globals.databaseName}
+      DB_PORT: 5432
+      DB_VERSION: 12.3
+      DB_MIGRATIONS_TRANSACTIONS: true
+  adjust-env-vars-db:
+    api [sqldb]: env.control.AddContainerEnvVars
+    vars:
+      DB_PASSWORD: ${globals.db_password}

@@ -1,0 +1,7 @@
+# Coverage directory used by tools like istanbul
+coverage
+*.lcov
+.env
+*.zip
+node_modules/
+.idea

@@ -1,0 +1,20 @@
+{
+  "extends": [
+    "standard",
+  ],
+  "plugins": [
+    "standard"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2018
+  },
+  "env": {
+    "node": true,
+    "es6": true,
+    "jest": true
+  },
+  "rules": {
+    "space-before-function-paren": 0,
+    "new-cap": 0,
+  }
+}

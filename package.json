@@ -1,0 +1,41 @@
+{
+  "name": "search_properties",
+  "version": "1.0.0",
+  "description": "Search properties within certain area and make bookings",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "jest",
+    "dev": "nodemon src/server.js",
+    "knex": "knex",
+    "migrate": "knex migrate:latest",
+    "start": "node src/server.js"
+  },
+  "keywords": [
+    "properties",
+    "booking"
+  ],
+  "author": "Evtimiy Mihaylov",
+  "license": "MIT",
+  "dependencies": {
+    "await-to-js": "^2.1.1",
+    "awilix": "^4.2.6",
+    "axios": "^0.19.2",
+    "change-case-object": "^2.0.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.6.0",
+    "http-status-codes": "^1.4.0",
+    "knex": "^0.21.2",
+    "moment": "^2.27.0",
+    "node-fetch": "^2.6.0",
+    "pg": "^8.3.0",
+    "uuid": "^8.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.4.0",
+    "eslint-plugin-standard": "^4.0.1",
+    "jest": "^26.1.0",
+    "nodemon": "^2.0.4",
+    "standard": "^14.3.4"
+  }
+}
