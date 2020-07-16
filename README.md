@@ -1,4 +1,4 @@
-#Properties search app
+# Properties search app
 
 ### Properties Search Deployment to the Cloud
 
@@ -53,3 +53,16 @@ DB_MIGRATIONS_TRANSACTIONS=false
 DEBUG=knex:*
 ```
 `DEBUG` is the debug parameter used in knex for adjusting the debug information
+
+`DB_MIGRATIONS_TRANSACTIONS` is an additional environment variable, related to a problem
+when running migrations under databases like CockroachDB. Set to `false` for CockroachDB
+
+- Run the migrations:
+```bash
+npm run migrate
+```
+
+- Start the server (this will start the server behind `nodemon`, so that your changes to files will cause server restart)
+```bash
+npm run dev
+```
