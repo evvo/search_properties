@@ -32,7 +32,8 @@ class BookingRepository {
     return db
       .table('bookings')
       .count('id')
-      .where('start_date', '<=', endDate)
+      .where('property_id', '=', propertyId)
+      .andWhere('start_date', '<=', endDate)
       .andWhere('end_date', '>=', startDate)
       .first()
   }
