@@ -10,6 +10,7 @@ const bookingRepository = container.resolve('bookingRepository')
 const snake = require('change-case-object').snake
 const { validate } = require('./validation/validationHelpers')
 const Response = require('./response')
+const cors = require('cors')
 const {
   propertyValidator,
   getPropertyBookingsValidator,
@@ -18,10 +19,12 @@ const {
 } = require('./validation/validators')
 
 const app = express()
-const port = process.env.API_PORT
+const port = process.env.API_PORT || 3000
 const apiPath = process.env.API_PATH
 
 app.use(express.json())
+app.use(cors())
+app.options('*', cors())
 app.disable('x-powered-by')
 
 app.get(`${apiPath}/properties`, validate(getPropertiesValidator), async (req, res) => {

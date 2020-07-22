@@ -1,13 +1,27 @@
 const { BaseApiHandler } = require('./BaseApiHandler')
 const axios = require('axios')
 const { to } = require('await-to-js')
+const compose = require('compose-function')
+const async = require('async')
 
 class HereApiHandler extends BaseApiHandler {
   static async fetchRawProperty(propertyId) {
     const params = HereApiHandler.buildParams({})
-    const propertyContextId = ';context=Zmxvdy1pZD1kN2FjODdiYi04MTVkLTU0MWYtYWZmOS1mOGFlODI1ODkwNGJfMTU5NDg2NDk3NDA1M183MjE1XzkwNiZyYW5rPTE5'
+    // Context parameter is not used, but required by the API
+    const propertyContextId = ';context=no'
 
     return axios.get(`https://places.ls.hereapi.com/places/v1/places/${propertyId + propertyContextId}?` + params)
+  }
+
+  static async decorateAdditionalData(items) {
+    await async.mapLimit(items, 20, async (item) => {
+      try {
+        const result = await HereApiHandler.fetchRawProperty(item.id)
+        item.additionalData = result.data
+      } catch (e) {}
+
+      return item
+    })
   }
 
   static async getPropertiesByCoordinates(lat, lng) {
@@ -31,11 +45,40 @@ class HereApiHandler extends BaseApiHandler {
       return []
     }
 
-    return response.data.results.items.map(result => ({
+    await HereApiHandler.decorateAdditionalData(response.data.results.items)
+
+    return compose(HereApiHandler.filterUniqueGeoLocations, HereApiHandler.formatItems)(response.data.results.items)
+  }
+
+  static filterUniqueGeoLocations(items) {
+    const uniqueLatLng = new Set()
+
+    return items.filter((item) => {
+      const itemPosition = `${item.position[0]},${item.position[1]}`
+      if (uniqueLatLng.has(itemPosition)) {
+        return false
+      }
+
+      uniqueLatLng.add(itemPosition)
+      return true
+    })
+  }
+
+  static getImageFromResult(result) {
+    if (result.additionalData && result.additionalData.media.images.available) {
+      return result.additionalData.media.images.items[0].src
+    }
+
+    return null
+  }
+
+  static formatItems(items) {
+    return items.map(result => ({
       id: result.id,
       name: result.title,
       position: result.position,
-      distance: result.distance
+      distance: result.distance,
+      image: HereApiHandler.getImageFromResult(result)
     }))
   }
 
