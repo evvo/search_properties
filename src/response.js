@@ -24,6 +24,10 @@ class Response {
       .send(Response.successData(data))
   }
 
+  static constructServerError(data) {
+    return { errors: [{ param: 'server', msg: data, location: 'server' }] }
+  }
+
   static async error(res, data, status = HttpStatus.INTERNAL_SERVER_ERROR) {
     res
       .status(status)
@@ -43,13 +47,13 @@ class Response {
   static async serverError(res, err) {
     console.error('serverError', err)
 
-    return Response.error(res, messages.INTERNAL_SERVER_ERROR)
+    return Response.error(res, Response.constructServerError(messages.INTERNAL_SERVER_ERROR))
   }
 
   static async apiError(res, err) {
     console.error('apiError', err)
 
-    return Response.error(res, messages.API_ERROR)
+    return Response.error(res, Response.constructServerError(messages.API_ERROR))
   }
 
   static async validationError(res, err) {
@@ -61,13 +65,13 @@ class Response {
   static async notFoundError(res, err) {
     console.error('notFoundError', err)
 
-    return Response.error(res, { message: messages.URL_NOT_FOUND }, HttpStatus.NOT_FOUND)
+    return Response.error(res, Response.constructServerError(messages.URL_NOT_FOUND), HttpStatus.NOT_FOUND)
   }
 
   static async databaseError(res, err) {
     console.error('databaseError', err)
 
-    return Response.error(res, messages.DATABASE_ERROR)
+    return Response.error(res, Response.constructServerError(messages.DATABASE_ERROR))
   }
 }
 

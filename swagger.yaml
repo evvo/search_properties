@@ -1,0 +1,116 @@
+openapi: 3.0.0
+info:
+  title: "Swagger SearchProperties"
+  description: "Search Properties"
+  version: "1.0.0"
+  contact:
+    email: "evo@vaupe.com"
+produces: "application/json"
+consumes: "application/json"
+paths:
+  /properties:
+    get:
+      summary: "List properties that are near area"
+      description: "List properties that are near area"
+      operationId: "listProperties"
+      parameters:
+        - in: query
+          name: LAT
+          schema:
+            type: number
+            format: float32
+            required: true
+        - in: query
+          name: LONG
+          schema:
+            type: number
+            format: float32
+            required: true
+      responses:
+        "422":
+          description: "Validation Error"
+        "200":
+          description: "Success"
+  /properties/{propertyId}/bookings:
+    get:
+      summary: "Get bookings for property"
+      description: "Get bookings for property"
+      operationId: "getBookings"
+      parameters:
+        - in: path
+          name: propertyId
+          description: The booking to be created
+          schema:
+            type: "string"
+            required: true
+      responses:
+        "422":
+          description: "Validation Error"
+        "200":
+          description: "Success"
+  /bookings:
+    post:
+      summary: "Add new booking for property"
+      description: "Add booking"
+      operationId: "addBooking"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/Booking"
+      responses:
+        "422":
+          description: "Validation Error"
+        "200":
+          description: "Success"
+definitions:
+  Property:
+    type: object
+    id:
+      type: uuid
+      readOnly: true
+    name:
+      type: string
+    position:
+      type: array
+      items:
+        type: float32
+    distance:
+      type: number
+      format: int32
+    image:
+      type: string
+      nullable: true
+  Booking:
+    type: "object"
+    required:
+      - propertyId
+      - startDate
+      - endDate
+      - username
+    properties:
+      id:
+        type: "uuid"
+        readOnly: true
+      propertyId:
+        type: "string"
+      startDate:
+        type: "string"
+        format: "date"
+      endDate:
+        type: "string"
+        format: "date"
+      username:
+        type: "string"
+        description: "Username"
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"

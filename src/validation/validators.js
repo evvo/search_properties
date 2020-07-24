@@ -10,13 +10,17 @@ const {
 const { param, body, query } = require('express-validator')
 
 const getPropertiesValidator = [
-  query('LAT').isFloat(),
-  query('LONG').isFloat()
+  query('LAT')
+    .isFloat({ min: -90, max: 90 }),
+  query('LONG')
+    .isFloat({ min: -180, max: 180 })
 ]
 
 const propertyValidator = [
   body('propertyId')
+    .trim()
     .isString()
+    .not().isEmpty()
     .bail()
     .custom(isPropertyExisting)
 ]
@@ -31,12 +35,14 @@ const getPropertyBookingsValidator = [
 
 const createBookingValidator = [
   body('username')
-    .isString(),
+    .trim()
+    .isString()
+    .not().isEmpty(),
 
   body(['startDate', 'endDate'])
     .isDate('YYYY-MM-DD')
     .bail()
-    .custom(isFutureDate).withMessage('End Date must be in the future')
+    .custom(isFutureDate).withMessage('Dates must be in the future')
     .custom(isEndDateLaterThanStartDate).withMessage('End Date must be later than or equal to the Start Date')
     .bail()
     .custom(isBookingPeriodAvailable).withMessage('Property is not available for these dates2')

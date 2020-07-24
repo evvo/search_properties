@@ -3,7 +3,7 @@
 const { validationResult } = require('express-validator')
 const moment = require('moment')
 const { to } = require('await-to-js')
-const camel = require('change-case-object').camel
+const humps = require('humps')
 const apiHandler = require('../diContainer').resolve('apiHandler')
 const bookingRepository = require('../diContainer').resolve('bookingRepository')
 const Response = require('../response')
@@ -50,7 +50,7 @@ function isEndDateLaterThanStartDate (value, { req }) {
 }
 
 async function isBookingPeriodAvailable (value, { req }) {
-  const { propertyId, startDate, endDate } = camel(req.body)
+  const { propertyId, startDate, endDate } = humps.camelizeKeys(req.body)
 
   const [err, result] = await to(
     bookingRepository.getBookingsCountForPropertyAndPeriod(
