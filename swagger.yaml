@@ -29,6 +29,8 @@ paths:
       responses:
         "422":
           description: "Validation Error"
+        "500":
+          description: "Internal Server Error"
         "200":
           description: "Success"
   /properties/{propertyId}/bookings:
@@ -46,6 +48,8 @@ paths:
       responses:
         "422":
           description: "Validation Error"
+        "500":
+          description: "Internal Server Error"
         "200":
           description: "Success"
   /bookings:
@@ -62,6 +66,8 @@ paths:
       responses:
         "422":
           description: "Validation Error"
+        "500":
+          description: "Internal Server Error"
         "200":
           description: "Success"
 definitions:
@@ -104,13 +110,17 @@ definitions:
       username:
         type: "string"
         description: "Username"
-  ApiResponse:
+  ApiResponseSuccess:
     type: "object"
     properties:
-      code:
-        type: "integer"
-        format: "int32"
-      type:
-        type: "string"
-      message:
-        type: "string"
+      success:
+        type: "boolean"
+      data:
+        type: "object"
+  ApiResponseError:
+    type: "object"
+    properties:
+      error:
+        type: "boolean"
+      data:
+        type: "object"

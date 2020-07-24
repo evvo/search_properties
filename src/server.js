@@ -32,8 +32,6 @@ app.use(cors())
 app.options('*', cors())
 app.disable('x-powered-by')
 
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, options))
-
 const swaggerOptions = {
   explorer: true
 }

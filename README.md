@@ -66,3 +66,7 @@ npm run migrate
 ```bash
 npm run dev
 ```
+
+SWAGGER API Docs are available at this endpoint:
+
+`/api-docs/`
