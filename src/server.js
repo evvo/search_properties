@@ -99,5 +99,6 @@ app.all('*',
     return Response.notFoundError(res, { path: req.path, method: req.method })
   })
 
+app.enable('trust proxy')
 app.use(Response.errorHandler)
 app.listen(port, () => console.log(`Properties app listening at http://localhost:${port}`))
