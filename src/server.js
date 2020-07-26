@@ -90,7 +90,7 @@ app.get(`${apiPath}/properties/:propertyId/bookings`, validate(getPropertyBookin
     return Response.databaseError(res, err)
   }
 
-  return Response.success(res, bookings)
+  return Response.success(res, humps.camelizeKeys(bookings))
 })
 
 // Error 404
