@@ -31,7 +31,7 @@
     "humps": "^2.0.1",
     "knex": "^0.21.2",
     "moment": "^2.27.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "pg": "^8.3.0",
     "swagger-ui-express": "4.1.2",
     "uuid": "^8.2.0",
