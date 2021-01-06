@@ -20,7 +20,7 @@
     "async": "^3.2.0",
     "await-to-js": "^2.1.1",
     "awilix": "^4.2.6",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "change-case-object": "^2.0.0",
     "compose-function": "^3.0.3",
     "cors": "^2.8.5",
