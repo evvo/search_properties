@@ -29,7 +29,7 @@
     "express-validator": "^6.6.0",
     "http-status-codes": "^1.4.0",
     "humps": "^2.0.1",
-    "knex": "^0.21.2",
+    "knex": "^2.4.0",
     "moment": "^2.27.0",
     "node-fetch": "^2.6.0",
     "pg": "^8.3.0",
